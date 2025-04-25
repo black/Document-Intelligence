@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-gray-50 md:max-w-screen-2xl mx-auto p-16">
+    <h1>PDF Question Answering System</h1>
+    
+    <div class="grid grid-cols-2 gap-2 border border-gray-300 p-6 rounded-lg">
+        <div class="space-y-4">
+            <h2 class="text-2xl">Documents</h2> 
+            <div class="space-y-4">
+                <h3>Upload PDF</h3>
+                <input type="file" id="pdf-upload" accept=".pdf" class="w-full border p-2 border-gray-300">
+                <button id="upload-button" class="border border-gray-300 hover:bg-gray-50 px-6 py-2 rounded-lg cursor-pointer">Upload</button>
+                <div id="upload-status"></div>
+            </div>
+            
+            <div class="document-list" id="document-list">
+                <div class="loading">Loading documents...</div>
+            </div>
+        </div>
+        
+        <div class="flex flex-col gap-4">
+            <h2>Ask Questions</h2>
+            <div id="selected-document">No document selected</div> 
+            <textarea id="question-input" placeholder="Ask a question about the selected document..." class="w-full border p-2 border-gray-300"></textarea>
+            <button id="ask-button" disabled class="border border-gray-300 hover:bg-gray-50 px-6 py-2 rounded-lg cursor-pointer w-fit">Ask</button>
+         
+            <div class="answer-box" id="answer-box">
+                <p>Select a document and ask a question to see the answer here.</p>
+            </div>
+        </div>
+    </div>
+    <script src="main.js"></script>
+</body>
+</html>
