@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 </head>
 <body class="bg-gray-50 md:max-w-screen-2xl mx-auto p-16 space-y-4">
     <h1>PDF Question Answering System</h1> 
@@ -14,7 +15,7 @@
             <div class="space-y-4">
                 <h3>Upload PDF</h3>
                 <div class="flex">
-                    <input type="file" id="pdf-upload" accept=".pdf" class="w-full border p-2 border-gray-300 rounded-l-lg bg-gray-100">
+                    <input type="file" id="pdf-upload" accept="application/pdf" class="w-full border p-2 border-gray-300 rounded-l-lg bg-gray-100">
                     <button id="upload-button" class="border border-gray-300 hover:bg-gray-50 px-6 py-2 rounded-r-lg cursor-pointer">Upload</button>
                 </div>
                 <div id="upload-status" class="text-xs text-gray-400"></div>

@@ -3,32 +3,35 @@ const API_URL = 'http://localhost:5000';
 let selectedDocId = null;
 
 // DOM Elements
-const documentList = document.getElementById('document-list');
-const selectedDocumentDisplay = document.getElementById('selected-document');
-const uploadButton = document.getElementById('upload-button');
-const fileInput = document.getElementById('pdf-upload');
-const uploadStatus = document.getElementById('upload-status');
-const questionInput = document.getElementById('question-input');
-const askButton = document.getElementById('ask-button');
-const answerBox = document.getElementById('answer-box');
+const documentList = $('#document-list');
+const selectedDocumentDisplay = $('#selected-document');
+const uploadButton = $('#upload-button');
+const fileInput = $('#pdf-upload');
+const uploadStatus = $('#upload-status');
+const questionInput = $('#question-input');
+const askButton = $('#ask-button');
+const answerBox = $('#answer-box');
 
 // Load documents on page load
-document.addEventListener('DOMContentLoaded', loadDocuments);
+//$('DOMContentLoaded', loadDocuments);
+
+$(document).ready(loadDocuments)
 
 // Event listeners
-uploadButton.addEventListener('click', uploadPDF);
-askButton.addEventListener('click', askQuestion);
+//uploadButton.addEventListener('click', uploadPDF);
+uploadButton.click(uploadPDF) 
+askButton.click(askQuestion);
 
 // Functions
 function loadDocuments() {
+    console.log("page lodaded")
     fetch(`${API_URL}/documents`)
         .then(response => response.json())
         .then(data => {
-            if (data.documents && data.documents.length > 0) {
-                documentList.innerHTML = '';
+            if (data.documents && data.documents.length > 0) { 
                 data.documents.forEach(doc => {
                     const docElement = document.createElement('div');
-                    docElement.className = 'document-item';
+                    docElement.className = 'p-4';
                     docElement.innerHTML = `
                         <span>${doc.filename}</span>
                         <button class="delete" data-docid="${doc.doc_id}">Delete</button>
@@ -37,17 +40,19 @@ function loadDocuments() {
                         if (!e.target.classList.contains('delete')) {
                             selectDocument(doc.doc_id, doc.filename);
                         }
-                    });
-                    
-                    documentList.appendChild(docElement);
-                });
-                
+                    }); 
+
+                    documentList.append( docElement);
+                    //documentList.appendChild(docElement);
+                }); 
                 // Add event listeners to delete buttons
                 document.querySelectorAll('.delete').forEach(button => {
-                    button.addEventListener('click', (e) => {
+                    button.click((e)=>{
                         e.stopPropagation();
                         deleteDocument(button.getAttribute('data-docid'));
-                    });
+                    })
+                    // button.addEventListener('click', (e) => {
+                    // });
                 });
             } else {
                 documentList.innerHTML = '<p>No documents uploaded yet.</p>';
@@ -60,12 +65,12 @@ function loadDocuments() {
 }
 
 function uploadPDF() {
-    const file = fileInput.files[0];
+    console.log("uploading PDF");
+    const file = fileInput[0].files[0];
     if (!file) {
         showStatus('Please select a PDF file.', 'error');
         return;
-    }
-    
+    } 
     if (!file.name.toLowerCase().endsWith('.pdf')) {
         showStatus('Only PDF files are supported.', 'error');
         return;
