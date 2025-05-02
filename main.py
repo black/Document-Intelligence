@@ -23,8 +23,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max upload size
 
 # Initialize embeddings and LLM model
-embeddings = OllamaEmbeddings(model="deepseek-r1:1.5b")
-model = OllamaLLM(model="deepseek-r1:1.5b")
+embeddings = OllamaEmbeddings(model="nomic-embed-text")
+model = OllamaLLM(model="gemma3:4b")
 
 # Store vector databases in memory
 vector_stores = {}
@@ -42,14 +42,13 @@ prompt_template = ChatPromptTemplate.from_template(template)
 def upload_pdf():
     """
     Endpoint to upload a PDF and create a vector store
-    """
-
-    print("received...")
+    """ 
 
     if 'file' not in request.files:
         return jsonify({'error': 'No file part in the request'}), 400
     
     file = request.files['file']
+    print(file)
     
     if file.filename == '':
         return jsonify({'error': 'No file selected'}), 400
@@ -76,6 +75,7 @@ def upload_pdf():
         })
     
     except Exception as e:
+        print(str(e))
         return jsonify({'error': str(e)}), 500
 
 @app.route('/query', methods=['POST'])

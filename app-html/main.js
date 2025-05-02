@@ -11,7 +11,9 @@ const uploadStatus = $('#upload-status');
 const questionInput = $('#question-input');
 const askButton = $('#ask-button');
 const answerBox = $('#answer-box');
-
+const loadingProgress = $('#loading-Progress')
+const uploadProgress = $('#upload-progress');
+const respProgress  = $('#response-progress');
 // Load documents on page load
 //$('DOMContentLoaded', loadDocuments);
 
@@ -30,20 +32,8 @@ function loadDocuments() {
         .then(data => {
             if (data.documents && data.documents.length > 0) { 
                 data.documents.forEach(doc => {
-                    const docElement = document.createElement('div');
-                    docElement.className = 'p-4';
-                    docElement.innerHTML = `
-                        <span>${doc.filename}</span>
-                        <button class="delete" data-docid="${doc.doc_id}">Delete</button>
-                    `;
-                    docElement.addEventListener('click', (e) => {
-                        if (!e.target.classList.contains('delete')) {
-                            selectDocument(doc.doc_id, doc.filename);
-                        }
-                    }); 
-
-                    documentList.append( docElement);
-                    //documentList.appendChild(docElement);
+                    var option = $("<option>").val(doc.doc_id).text(doc.filename);
+                    $('#document-list-dropdown').append(option) 
                 }); 
                 // Add event listeners to delete buttons
                 document.querySelectorAll('.delete').forEach(button => {
@@ -55,7 +45,7 @@ function loadDocuments() {
                     // });
                 });
             } else {
-                documentList.innerHTML = '<p>No documents uploaded yet.</p>';
+                loadingProgress.removeClass('hidden')
             }
         })
         .catch(error => {
@@ -64,31 +54,35 @@ function loadDocuments() {
         });
 }
 
+
+$("#document-list-dropdown").on("change", function() {
+    selectedDocId = $(this).val(); 
+    selectDocument(selectedDocId)
+});
+
 function uploadPDF() {
     console.log("uploading PDF");
     const file = fileInput[0].files[0];
     if (!file) {
-        showStatus('Please select a PDF file.', 'error');
+        console.log('Please select a PDF file.', 'error');
         return;
     } 
     if (!file.name.toLowerCase().endsWith('.pdf')) {
-        showStatus('Only PDF files are supported.', 'error');
+        console.log('Only PDF files are supported.', 'error');
         return;
     }
     
     const formData = new FormData();
     formData.append('file', file);
-    
-    showStatus('Uploading and processing PDF...', 'info');
-    
+     
+    uploadProgress.removeClass('hidden');
     fetch(`${API_URL}/upload`, {
         method: 'POST',
         body: formData
     })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            showStatus('PDF uploaded successfully!', 'success');
+        if (data.success) { 
             fileInput.value = '';
             loadDocuments();
         } else {
@@ -96,43 +90,31 @@ function uploadPDF() {
         }
     })
     .catch(error => {
-        console.error('Error uploading PDF:', error);
-        showStatus('Error uploading PDF. Please try again.', 'error');
+        console.error('Error uploading PDF:', error); 
+        uploadProgress.addClass('hidden');
     });
 }
 
-function selectDocument(docId, filename) {
-    selectedDocId = docId;
-    selectedDocumentDisplay.textContent = `Selected: ${filename}`;
-    askButton.disabled = false;
-    
-    // Update UI to show selected document
-    document.querySelectorAll('.document-item').forEach(item => {
-        item.classList.remove('active');
-        if (item.querySelector('.delete').getAttribute('data-docid') === docId) {
-            item.classList.add('active');
-        }
-    });
-    
-    // Clear previous answers
-    answerBox.innerHTML = '<p>Ask a question about this document.</p>';
+function selectDocument(selectedDocId) { 
+    askButton.disabled = false;   
+    console.log("Document Selected :: " , selectedDocId)
 }
 
 function askQuestion() {
-    const question = questionInput.value.trim();
-    
+    const question = questionInput.val().trim();
+    console.log(question) 
     if (!selectedDocId) {
-        showStatus('Please select a document first.', 'error');
+        console.log('Please select a document first.', 'error');
         return;
     }
     
     if (!question) {
-        showStatus('Please enter a question.', 'error');
+        console.log('Please enter a question.', 'error');
         return;
     }
     
     answerBox.innerHTML = '<div class="loading">Generating answer...</div>';
-    
+    respProgress.removeClass('hidden');
     fetch(`${API_URL}/query`, {
         method: 'POST',
         headers: {
@@ -145,23 +127,27 @@ function askQuestion() {
     })
     .then(response => response.json())
     .then(data => {
+
+        console.log(data)
+
         if (data.error) {
-            answerBox.innerHTML = `<p class="error">Error: ${data.error}</p>`;
+            answerBox.append(`<p class="error">Error: ${data.error}</p>`);
             return;
         }
         
-        let answerHTML = `<p>${data.answer}</p>`;
-        
+      //  let answerHTML = `<p>${data.answer}</p>`;
+        var bubble = $("<li class='text-sm p-4 rounded-sm p-4'>").text(data.answer); 
+        var source = $("<div>")
         // Add sources if available
         if (data.sources && data.sources.length > 0) {
-            answerHTML += '<div class="sources"><strong>Sources:</strong><ul>';
+            // answerHTML += '<div class="sources"><strong>Sources:</strong><ul>';
             data.sources.forEach(source => {
-                answerHTML += `<li>${source.filename} (Page ${source.page})</li>`;
-            });
-            answerHTML += '</ul></div>';
-        }
-        
-        answerBox.innerHTML = answerHTML;
+                source += `<li>${source.filename} (Page ${source.page})</li>`;
+            }); 
+            answerBox.append(bubble);
+            answerBox.append(source); 
+        } 
+        respProgress.addClass('hidden');
     })
     .catch(error => {
         console.error('Error asking question:', error);
@@ -185,23 +171,12 @@ function deleteDocument(docId) {
                 }
                 loadDocuments();
             } else {
-                showStatus(`Error: ${data.error}`, 'error');
+                console.log(`Error: ${data.error}`, 'error');
             }
         })
         .catch(error => {
             console.error('Error deleting document:', error);
-            showStatus('Error deleting document. Please try again.', 'error');
+            console.log('Error deleting document. Please try again.', 'error');
         });
     }
-}
-
-function showStatus(message, type) {
-    uploadStatus.className = 'status-message ' + type;
-    uploadStatus.textContent = message;
-    
-    // Clear status after 5 seconds
-    setTimeout(() => {
-        uploadStatus.textContent = '';
-        uploadStatus.className = 'status-message';
-    }, 5000);
-}
+} 
