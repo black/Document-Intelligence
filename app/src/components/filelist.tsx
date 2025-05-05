@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { DeleteIcon } from "lucide-react"
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button"
 import { toast } from "sonner";
 import {
   Select,
@@ -23,6 +25,27 @@ const FileList = (props: Props) => {
   const [files, setFiles] = useState<DocType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // delete document
+  const handleDelete = (docId:string) =>{
+    if (confirm('Are you sure you want to delete this document?')) {
+        fetch(`${API_URL}/delete/${docId}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {  
+                toast("Deleted files successfully");
+            } else {
+                console.log(`Error: ${data.error}`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error deleting document:', error);
+            toast("Error deleting document. Please try again.");  
+        });
+    }
+  }
 
   useEffect(() => {
     fetch(`${API_URL}/documents`) // Example API
@@ -63,7 +86,7 @@ const FileList = (props: Props) => {
         <SelectContent>
           {files.map((file, i) => (
             <SelectItem value={file.doc_id} key={i}>
-              {file.filename}
+              {file.filename}  <Button variant="outline" size="icon" onClick={() => handleDelete(file.doc_id)}><DeleteIcon /></Button>
             </SelectItem>
           ))}
         </SelectContent>

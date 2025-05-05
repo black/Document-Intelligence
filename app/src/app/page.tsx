@@ -97,8 +97,7 @@ export default function Home() {
   const handleSelect = (value:DocType) => {
     console.log(value.doc_id, value.filename)
     setDocument(value); 
-  };
-
+  }; 
   return (
     <div className="flex flex-col gap-4 w-full h-screen">  
         <div className="flex overflow-hidden">
