@@ -43,6 +43,21 @@ npm run dev
 
 ```bash
 pip install -r requirements.txt
-python main.py
+```
 
+#### 4.a Create environment 
+
+```bash
+python3 -m venv .venv 
+```
+
+#### 4.b Activate Environment
+
+```bash
+.venv\Scripts\activate
+```
+
+#### 4.c Start server
+```bash
+python main.py
 ```
