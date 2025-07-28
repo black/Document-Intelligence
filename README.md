@@ -1,4 +1,4 @@
-# document-intelligence
+# Document-Intelligence
 
 **Description:**  
 A Retrieval-Augmented Generation (RAG) system that uses [Ollama](https://ollama.com) to enable intelligent document understanding. It employs two separate models — one for embedding documents and another for semantic question answering — to provide contextual responses based on the ingested content.
