@@ -124,7 +124,7 @@ export default function Home() {
                     </div>
                     <FileList API_URL={API_URL} onSelectChange={handleSelect}  key={refreshKey}/>
                 </div> 
-                <div className="space-x-2 place-items-center"> 
+                <div className="space-x-2 place-items-center">  
                   <Button variant="outline" size="icon"><Mic /></Button>
                   <Button variant="outline" size="icon"><Paperclip /></Button>
                   <Button variant="outline" size="icon" onClick={postQuestion}>
